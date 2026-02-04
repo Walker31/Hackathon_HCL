@@ -165,27 +165,7 @@ ALLOWED_HOSTS=localhost,127.0.0.1
 ### Frontend (.env)
 ```
 VITE_API_BASE_URL=http://localhost:8000
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is part of the HCL Hackathon.
-
-## 👥 Team
-
-Developed as part of HCL Hackathon 2026.
-
-## 📧 Support
-
-For support, please contact the development team or create an issue in the repository.
+```development team or create an issue in the repository.
 
 ---
 
