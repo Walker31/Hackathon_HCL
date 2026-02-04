@@ -32,8 +32,9 @@ export default function StudentDashboard() {
     try {
       if (activeNav === "Dashboard" || activeNav === "Browse Catalog") {
         try {
-          const booksList = await booksService.getAll();
-          setBooks(booksList || []);
+          const response = await booksService.getAll();
+          const booksList = Array.isArray(response) ? response : response?.results || [];
+          setBooks(booksList);
         } catch (err) {
           console.error("Failed to load books:", err);
           setBooks([]);
@@ -96,15 +97,12 @@ export default function StudentDashboard() {
     }
   };
 
-  const handleRenewBook = async (borrowId) => {
+  const handleLogout = async () => {
     try {
-      setError("");
-      await borrowService.renewBook(borrowId);
-      setBorrowSuccess("Book renewed successfully!");
-      setTimeout(() => setBorrowSuccess(""), 3000);
-      loadData();
+      await logout();
+      navigate("/");
     } catch (err) {
-      setError("Failed to renew book: " + err.message);
+      console.error("Logout failed:", err);
     }
   };
 
@@ -124,7 +122,7 @@ export default function StudentDashboard() {
       <div className="mx-auto flex max-w-[1400px] gap-6 px-4 py-6">
         {/* Sidebar */}
         <aside className="hidden w-56 shrink-0 lg:block">
-          <div className="sticky top-6">
+          <div className="sticky top-6 flex flex-col h-[calc(100vh-48px)]">
             <div className="flex items-center gap-2">
               <div className="grid h-9 w-9 place-items-center rounded-xl bg-blue-600 text-white shadow-sm">
                 <span className="text-sm font-bold">L</span>
@@ -135,7 +133,7 @@ export default function StudentDashboard() {
               </div>
             </div>
 
-            <nav className="mt-6 grid gap-1">
+            <nav className="mt-8 grid gap-1">
               <SideItem 
                 label="Dashboard" 
                 active={activeNav} 
@@ -156,12 +154,26 @@ export default function StudentDashboard() {
               />
             </nav>
 
-            <div className="mt-auto pt-8">
-              <div className="flex items-center gap-3 rounded-xl bg-slate-100 p-3">
-                <div className="h-10 w-10 rounded-full bg-slate-300" />
-                <div>
-                  <p className="text-xs font-semibold">{username}</p>
-                  <p className="text-[11px] text-slate-500">Student</p>
+            <div className="mt-auto">
+              <button
+                onClick={handleLogout}
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-rose-600 hover:bg-rose-50 transition-colors"
+                title="Sign out of your account"
+              >
+                <span>🚪</span>
+                <span>Logout</span>
+              </button>
+
+              <div className="mt-4 flex items-center gap-3 rounded-xl bg-slate-100 p-3">
+                <div className="h-10 w-10 rounded-full bg-slate-300 overflow-hidden">
+                  <img 
+                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username || 'guest'}`} 
+                    alt="avatar" 
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-semibold">{user?.username || "Guest"}</p>
+                  <p className="text-[11px] text-slate-500 capitalize">{user?.role || "Student"}</p>
                 </div>
               </div>
             </div>
@@ -170,23 +182,20 @@ export default function StudentDashboard() {
 
         {/* Main column */}
         <main className="flex-1 min-w-0">
-          {/* Status Banner */}
-          {!user?.is_approved && (
-            <div className="mb-6 rounded-3xl border border-amber-200 bg-amber-50 p-6 shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="grid h-10 w-10 place-items-center rounded-2xl bg-amber-100 text-amber-600">
-                  <span className="text-xl">⏳</span>
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-amber-900">Account Pending Approval</h3>
-                  <p className="mt-1 text-sm text-amber-700 font-medium">
-                    Your registration is still being reviewed by the library administrators. 
-                    You can browse the catalog, but you won't be able to borrow books or access full features until your account is approved.
-                  </p>
-                </div>
+          {/* Status Banner - Demo Mode */}
+          <div className="mb-6 rounded-3xl border border-blue-200 bg-blue-50 p-6 shadow-sm">
+            <div className="flex items-start gap-4">
+              <div className="grid h-10 w-10 place-items-center rounded-2xl bg-blue-100 text-blue-600">
+                <span className="text-xl">ℹ️</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-blue-900">Demo Mode</h3>
+                <p className="mt-1 text-sm text-blue-700 font-medium">
+                  You are viewing the Student Dashboard in public demo mode. Log in to access your personal account.
+                </p>
               </div>
             </div>
-          )}
+          </div>
           {/* Top bar */}
           <div className="flex items-center gap-3">
             <div className="flex flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 shadow-sm">
@@ -216,12 +225,9 @@ export default function StudentDashboard() {
             <>
               {/* Welcome Banner */}
               <section className="mt-6 rounded-3xl bg-gradient-to-r from-blue-600 to-blue-500 p-8 text-white shadow-sm">
-                <h1 className="text-3xl font-bold">Welcome back, {user?.username}! 👋</h1>
+                <h1 className="text-3xl font-bold">Welcome! 👋</h1>
                 <p className="mt-2 max-w-xl text-sm text-white/90">
-                  You have <span className="font-semibold">{stats.borrowedCount}</span> books currently borrowed.
-                  {stats.overdueCount > 0 && (
-                    <> You have <span className="font-semibold">{stats.overdueCount}</span> overdue books.</>
-                  )}
+                  Browse our library catalog and manage your book borrowing.
                 </p>
               </section>
 
