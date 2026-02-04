@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import SideItem from "../Components/dashboard/SideItem";
 import booksService from "../services/booksService";
 import borrowService from "../services/borrowService";
+import authService from "../services/authService";
 
 export default function StudentDashboard() {
   const username = "Guest User";
@@ -20,6 +21,8 @@ export default function StudentDashboard() {
     totalFines: 0,
     activities: []
   });
+
+  
 
   // Load books and borrowed books on mount
   useEffect(() => {
@@ -99,7 +102,7 @@ export default function StudentDashboard() {
 
   const handleLogout = async () => {
     try {
-      await logout();
+      await authService.logout();
       navigate("/");
     } catch (err) {
       console.error("Logout failed:", err);
@@ -167,13 +170,13 @@ export default function StudentDashboard() {
               <div className="mt-4 flex items-center gap-3 rounded-xl bg-slate-100 p-3">
                 <div className="h-10 w-10 rounded-full bg-slate-300 overflow-hidden">
                   <img 
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.username || 'guest'}`} 
+                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${'guest'}`} 
                     alt="avatar" 
                   />
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate text-xs font-semibold">{user?.username || "Guest"}</p>
-                  <p className="text-[11px] text-slate-500 capitalize">{user?.role || "Student"}</p>
+                  <p className="truncate text-xs font-semibold">{ "Guest"}</p>
+                  <p className="text-[11px] text-slate-500 capitalize">{"Student"}</p>
                 </div>
               </div>
             </div>
@@ -450,7 +453,8 @@ function BookCard({ book, onBorrow }) {
 
 function BorrowedBookCard({ book, onReturn, onRenew }) {
   const isOverdue = book.status === "overdue";
-  
+  console.log(book.book);
+
   return (
     <div className={`rounded-2xl border ${isOverdue ? 'border-red-200 bg-red-50' : 'border-slate-200 bg-white'} p-4 shadow-sm`}>
       <div 
@@ -460,12 +464,12 @@ function BorrowedBookCard({ book, onReturn, onRenew }) {
       
       <div>
         <h3 
-          onClick={() => window.location.href = `/book/${book.book_id || book.id}`}
+          onClick={() => window.location.href = `/book/${book.book.book_id || book.id}`}
           className="font-semibold text-sm line-clamp-2 cursor-pointer hover:text-blue-600 transition"
         >
-          {book.book_title || book.title}
+          {book.book_title || book.book.title}
         </h3>
-        <p className="text-xs text-slate-500 mt-1">{book.author}</p>
+        <p className="text-xs text-slate-500 mt-1">{book.book.author}</p>
         
         <div className="mt-2 flex items-center gap-2">
           <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${

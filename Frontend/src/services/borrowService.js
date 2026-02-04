@@ -19,6 +19,7 @@ const borrowService = {
     try {
       const response = await api.post(`${BORROW_ENDPOINT}/borrow/`, {
         book_id: bookId,
+        user_id: 8, // Assuming user ID is derived from the auth token
       });
       return response.data;
     } catch (error) {

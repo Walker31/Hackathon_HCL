@@ -45,7 +45,7 @@ export default function AdminDashboard() {
             {/* Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold">Dashboard</h1>
+                <h1 className="text-3xl font-bold">Admin Dashboard</h1>
                 <select
                   value={range}
                   onChange={(e) => setRange(e.target.value)}
@@ -54,6 +54,7 @@ export default function AdminDashboard() {
                   <option>Weekly</option>
                   <option>Monthly</option>
                   <option>Yearly</option>
+                  <option>quarterly</option>
                 </select>
               </div>
             </div>
