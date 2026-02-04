@@ -1,0 +1,29 @@
+[tool.black]
+line-length = 120
+target-version = ['py310', 'py311', 'py312']
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | migrations
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 120
+skip_gitignore = true
+skip = ["migrations"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "hclBackend.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+addopts = "--cov=. --cov-report=html --cov-report=term-missing"
+testpaths = ["."]

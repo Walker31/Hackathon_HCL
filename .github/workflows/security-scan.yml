@@ -1,0 +1,79 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly scan
+
+jobs:
+  backend-security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+        cache-dependency-path: 'hclBackend/requirements.txt'
+    
+    - name: Install security tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit safety
+    
+    - name: Run Bandit security scan
+      working-directory: ./hclBackend
+      run: |
+        bandit -r . -ll --exclude migrations,venv,tests.py
+      continue-on-error: true
+    
+    - name: Check for known vulnerabilities
+      working-directory: ./hclBackend
+      run: |
+        pip install -r requirements.txt
+        safety check --json
+      continue-on-error: true
+
+  frontend-security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run npm audit
+      working-directory: ./Frontend
+      run: |
+        npm audit --audit-level=moderate
+      continue-on-error: true
+    
+    - name: Run npm audit fix (dry-run)
+      working-directory: ./Frontend
+      run: |
+        npm audit fix --dry-run
+      continue-on-error: true
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Check for outdated dependencies (Backend)
+      working-directory: ./hclBackend
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip list --outdated
+      continue-on-error: true
+    
+    - name: Check for outdated dependencies (Frontend)
+      working-directory: ./Frontend
+      run: |
+        npm outdated
+      continue-on-error: true

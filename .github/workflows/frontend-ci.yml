@@ -1,0 +1,71 @@
+name: Frontend CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'Frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'Frontend/**'
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: 'Frontend/package-lock.json'
+    
+    - name: Install dependencies
+      working-directory: ./Frontend
+      run: npm ci
+    
+    - name: Run linting
+      working-directory: ./Frontend
+      run: npm run lint
+    
+    - name: Build application
+      working-directory: ./Frontend
+      run: npm run build
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      if: success()
+      with:
+        name: frontend-build-${{ matrix.node-version }}
+        path: Frontend/dist/
+        retention-days: 5
+
+  deploy:
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: frontend-build-18.x
+        path: Frontend/dist/
+    
+    - name: Deploy to production
+      working-directory: ./Frontend
+      run: |
+        echo "Deploying frontend to production..."
+        # Add your deployment script here
+        # Example: npm run deploy
