@@ -165,8 +165,8 @@ ALLOWED_HOSTS=localhost,127.0.0.1
 ### Frontend (.env)
 ```
 VITE_API_BASE_URL=http://localhost:8000
-```development team or create an issue in the repository.
+```
 
 ---
 
-**Last Updated**: February 4, 2026
+**Last Updated**: February 6, 2026
